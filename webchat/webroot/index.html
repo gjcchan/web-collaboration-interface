@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Generic Chatroom Name</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script>
+  	var chatroom = '';
+  	var hash;
+	window.onload = function() {
+	  var hash = window.location.hash.split('/');
+	  if(hash[1] == "chatroom" && hash[2] != chatroom) {
+	  	chatroom = hash[2];
+	  	var genFrame = "<iframe src=\"http://localhost:8088/?uid=" + localStorage.getItem("token") + "&chatroom=" + window.location.hash.split('/')[2] + "\" style=\"width: 100%;height: 570px;\" frameBorder=\"0\"></iframe>";
+	  	$("#chatbox").html(genFrame);
+	  } else if(hash[1] != "chatroom") {
+	  	chatroom = '';
+	  }
+	};
+	$(window).on('hashchange', function() {
+	  var hash = window.location.hash.split('/');
+	  if(hash[1] == "chatroom" && hash[2] != chatroom) {
+	  	chatroom = hash[2];
+	  	var genFrame = "<iframe src=\"http://localhost:8088/?uid=" + localStorage.getItem("token") + "&chatroom=" + window.location.hash.split('/')[2] + "\" style=\"width: 100%;height: 570px;\" frameBorder=\"0\"></iframe>";
+	  	$("#chatbox").html(genFrame);
+	  } else if(hash[1] != "chatroom") {
+	  	chatroom = '';
+	  }
+	});
+  </script>
+</head>
+<body>
+  <script type="text/x-handlebars">
+    <!--<h2>Welcome to Ember.js</h2>-->
+
+
+    <nav class="navbar navbar-inverse">
+    	<div class="container-fluid">
+	    	<div class="navbar-header">
+
+	    		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+	        		<span class="icon-bar"></span>
+	        		<span class="icon-bar"></span>
+	        		<span class="icon-bar"></span>
+      			</button>
+
+      			<a class="navbar-brand" href="#">Generic Chatroom Name</a>
+	    	</div>
+			<div class="collapse navbar-collapse" id="myNavbar">
+				<ul class="nav navbar-nav logged-in">
+			      {{#link-to 'index' tagName="li"}} <a href = {{view.href}}> Rooms </a> {{/link-to}}
+				  {{#link-to 'rooms' tagName="li"}} <a href = {{view.href}}> Owned Rooms </a> {{/link-to}}
+				  {{#link-to 'join' tagName="li"}} <a href = {{view.href}}> Join Rooms </a> {{/link-to}}
+				  {{#link-to 'create' tagName="li"}} <a href = {{view.href}}> Create Room </a> {{/link-to}}
+			    </ul>
+			    <ul class="nav navbar-nav navbar-right">
+				  {{#link-to 'login' tagName="li" class="logged-out"}} <a href = {{view.href}}><span class="glyphicon glyphicon-log-in"></span> Login </a> {{/link-to}}
+				  {{#link-to 'signup' tagName="li" class="logged-out"}} <a href = {{view.href}}><span class="glyphicon glyphicon-user"></span> Sign Up </a>{{/link-to}}
+				  {{#link-to 'login' tagName="li" class = "logged-in"}} <a href = {{view.href}} ><span class="glyphicon glyphicon-log-out"></span> Logout </a> {{/link-to}}
+			    </ul>
+
+			</div>
+		</div>
+
+	</nav>
+
+
+
+    {{outlet}}
+
+  </script>
+
+  <script type="text/x-handlebars" id="index">
+	<h3>Chatrooms</h3>
+    <ul class = "list-group">
+    {{#each model as |item|}}
+      <li class= "list-group-item">{{#link-to 'chatroom' item}} {{item.name}}{{/link-to}}<a href="" class="pull-right" {{action 'remove' item}}> leave </a> </li>
+    {{/each}}
+    </ul>
+  </script>
+
+  <script type="text/x-handlebars" id="rooms">
+  <h3>Chatrooms Owned</h3>
+    <ul class = "list-group">
+    {{#each model as |item|}}
+      <li class= "list-group-item">{{item.name}}  <span class="pull-right"> {{#link-to 'share' item}} share {{/link-to}}<span class="glyphicon glyphicon-share-alt"></span> <a href="" {{action 'remove' item}}><span class="glyphicon glyphicon-trash"></span> </a>	 </span></li>
+    {{/each}}
+    </ul>
+  </script>
+
+
+  <script type="text/x-handlebars" id="chatroom" data-template-name="chatroom">
+		<div class = "col-md-9">
+			<div id="chatbox"></div>
+		</div>
+		<div class = "col-md-3">
+			<div class="btn-group  btn-group-justified">
+			{{#link-to 'chatroom.todo' class="btn btn-default"}}Todo{{/link-to}}
+			{{#link-to 'chatroom.memo' class="btn btn-default"}} Memo {{/link-to}}
+			{{#link-to 'chatroom.download' class="btn btn-default"}} Files {{/link-to}}
+			</div>
+
+			{{outlet}}
+		</div>
+
+  </script>
+
+  <script type="text/x-handlebars" id="chatroom/todo">
+  <div class="panel panel-default">
+   <div class="panel-heading">
+	<h3 class="panel-title">Todo</h3>
+    </div>
+    <div class="panel-body">
+	<ul class = "list-group">
+	{{#each model as |item|}}
+      <li class= "list-group-item">{{item.todo}} <a href="" {{action 'remove' item}} class="pull-right glyphicon glyphicon-remove"></a></li>
+    {{/each}}
+	</ul>
+	<p><a href ="" {{action 'refresh'}}class="pull-right"><span class = "glyphicon glyphicon-refresh"></span></a><br/></p>
+	<form {{action 'create' on='submit'}}>
+		<div class="form-group">
+		<label for="todo">Todo</label>
+		  {{input value=todo placeholder='Enter Todo' class='form-control' spellcheck="true"}}
+		</div>
+		<button type="submit" class="btn btn-default">Submit</button>
+		{{#if errorMessage}}
+		<div class="alert alert-danger">
+		  <strong>Todo failed:</strong> {{errorMessage}}
+		</div>
+	  {{/if}}
+	</form>
+    </div>
+    </div>
+
+  </script>
+
+  <script type="text/x-handlebars" id="chatroom/memo">
+   <div class="panel panel-default">
+    <div class="panel-heading">
+     <h3 class="panel-title">Memos</h3>
+     </div>
+         <div class="panel-body">
+	 <ul class = "list-group">
+	{{#each model as |item|}}
+      <li class= "list-group-item"> user: {{item.user}} <br/> {{item.memo}}</li>
+    {{/each}}
+	</ul>
+	<p><a href ="" {{action 'refresh'}}class="pull-right"><span class = "glyphicon glyphicon-refresh"></span></a><br/></p>
+	<form {{action 'create' on='submit'}}>
+		<div class="form-group">
+		<label for="memo">Memo</label>
+		  {{input value=memo placeholder='Enter Memo' class='form-control' spellcheck="true"}}
+		</div>
+		<button type="submit" class="btn btn-default">Submit</button>
+		{{#if errorMessage}}
+		<div class="alert alert-danger">
+		  <strong>Memo failed:</strong> {{errorMessage}}
+		</div>
+	  {{/if}}
+	</form>
+</div>
+</div>
+  </script>
+
+
+  <script type="text/x-handlebars" id="login">
+  <h3>Login</h3>
+    <form {{action 'login' on='submit'}}>
+		<div class="form-group">
+		  <label for="identification">Login</label>
+		  {{input value=identification placeholder='Enter Login' class='form-control'}}
+		</div>
+		<div class="form-group">
+		  <label for="password">Password</label>
+		  {{input value=password placeholder='Enter Password' class='form-control' type='password'}}
+		</div>
+		<button type="submit" class="btn btn-default">Login</button>
+	</form>
+	  {{#if errorMessage}}
+		<div class="alert alert-danger">
+		  <strong>Login failed:</strong> {{errorMessage}}
+		</div>
+	  {{/if}}
+  </script>
+
+
+
+  <script type="text/x-handlebars" id="signup">
+  <h3>Signup</h3>
+    <form {{action 'create' on='submit'}}>
+		<div class="form-group">
+		  <label for="identification">Username</label>
+		  {{input value=identification placeholder='Enter Username' class='form-control'}}
+		</div>
+		<div class="form-group">
+		  <label for="password">Password</label>
+		  {{input value=password placeholder='Enter Password' class='form-control' type='password'}}
+		</div>
+		<div class="form-group">
+		  <label for="password2">Confirm Password</label>
+		  {{input value=password2 placeholder='Enter Password' class='form-control' type='password'}}
+		</div>
+		<button type="submit" class="btn btn-default">Signup</button>
+	</form>
+	  {{#if errorMessage}}
+		<div class="alert alert-danger">
+		  <strong>Signup failed:</strong> {{errorMessage}}
+		</div>
+	  {{/if}}
+  </script>
+
+  <script type="text/x-handlebars" id="create">
+  <h3>Create Chatroom</h3>
+    <form {{action 'create' on='submit'}}>
+		<div class="form-group">
+		  <label for="identification">Name</label>
+		  {{input value=identification placeholder='Name' class='form-control'}}
+		</div>
+		<div class="form-group">
+		  <label for="password">Password</label>
+		  {{input value=password placeholder='Enter Password' class='form-control' type='password'}}
+		</div>
+		<div class="form-group">
+		  <label for="password2">Confirm Password</label>
+		  {{input value=password2 placeholder='Enter Password' class='form-control' type='password'}}
+		</div>
+		<button type="submit" class="btn btn-default">Create</button>
+	</form>
+	  {{#if errorMessage}}
+		<div class="alert alert-danger">
+		  <strong>Create failed:</strong> {{errorMessage}}
+		</div>
+	  {{/if}}
+  </script>
+
+  <script type="text/x-handlebars" id="join">
+  <h3>Join Chatroom</h3>
+    <form {{action 'create' on='submit'}}>
+		<div class="form-group">
+		  <label for="identification">Name</label>
+		  {{input value=identification placeholder='Enter Name' class='form-control'}}
+		</div>
+		<div class="form-group">
+		  <label for="password">Password</label>
+		  {{input value=password placeholder='Enter Password' class='form-control' type='password'}}
+		</div>
+		<button type="submit" class="btn btn-default">Join</button>
+	</form>
+	  {{#if errorMessage}}
+		<div class="alert alert-danger">
+		  <strong>Join failed:</strong> {{errorMessage}}
+		</div>
+	  {{/if}}
+  </script>
+
+
+  <script type="text/x-handlebars" id="share">
+  <h3>Share Chatroom</h3>
+    <form {{action 'share' on='submit'}}>
+		<div class="form-group">
+		  <label for="identification">Email</label>
+		  {{input value=identification placeholder='Enter Email' class='form-control'}}
+		</div>
+		<button type="submit" class="btn btn-default">Share</button>
+	</form>
+	  {{#if errorMessage}}
+		<div class="alert alert-danger">
+		  <strong>Share failed:</strong> {{errorMessage}}
+		</div>
+	  {{/if}}
+  </script>
+
+  <script type="text/x-handlebars" id="chat" data-template-name="chat">
+  <div id="chatbox"></div>
+
+	  {{#if errorMessage}}
+		<div class="alert alert-danger">
+		  <strong>Chat failed:</strong> {{errorMessage}}
+		</div>
+	  {{/if}}
+  </script>
+
+  <script type="text/x-handlebars" id="chatroom/download">
+  <div class="panel panel-default">
+  <div class="panel-heading">
+	<h3 class="panel-title">Files</h3>
+</div>
+<div class="panel-body">
+	<ul class = "list-group">
+	{{#each model as |item|}}
+      <li class= "list-group-item"><a {{action 'getFile' item}}>{{item.name}}</a> <a href="" class="pull-right glyphicon glyphicon-remove" {{action 'remove' item}}></a></li>
+    {{/each}}
+	</ul>
+	<p><a href ="" {{action 'refresh'}}class="pull-right"><span class = "glyphicon glyphicon-refresh"></span></a><br/></p>
+
+	<form {{action 'upload' on='submit'}}>
+		<div class="form-group">
+		 <input type="file" id="file" multiple>
+		</div>
+		<button type="submit" class="btn btn-default">Upload <span class = "glyphicon glyphicon-upload"></span></button>
+	</form>
+	{{#if errorMessage}}
+		<div class="alert alert-danger">
+		  <strong>Upload failed:</strong> {{errorMessage}}
+		</div>
+	  {{/if}}
+       </div>
+</div>
+  </script>
+
+
+  <script src="js/libs/jquery-1.10.2.js"></script>
+  <script src="js/libs/ember-template-compiler-2.0.1.js"></script>
+  <script src="js/libs/ember-2.0.1.debug.js"></script>
+  <script src="js/libs/ember-data.js"></script>
+  <script src="js/libs/download.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

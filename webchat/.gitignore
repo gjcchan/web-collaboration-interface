@@ -1,0 +1,11 @@
+RESTServer/node_modules/
+node_module/
+npm-debug.log*
+frontend/bower_components/
+frontend/node_modules/
+backend/node_modules/
+npm-debug.log
+frontend/npm-debug.log
+backend/npm-debug.log
+.node_modules-tmp
+.bower_components-tmp
